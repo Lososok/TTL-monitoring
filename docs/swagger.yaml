@@ -1,0 +1,146 @@
+definitions:
+  transport.AddURLRequest:
+    properties:
+      url:
+        example: example.com
+        type: string
+    type: object
+  transport.CertificateResponse:
+    properties:
+      id:
+        type: string
+      not_after:
+        type: string
+      serial_number:
+        type: string
+      ttl_days:
+        type: integer
+      url:
+        type: string
+    type: object
+  transport.CertificatesListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/transport.CertificateResponse'
+        type: array
+      meta:
+        properties:
+          limit:
+            type: integer
+          page:
+            type: integer
+        type: object
+    type: object
+  transport.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /certificates:
+    get:
+      parameters:
+      - description: Номер страницы
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Размер страницы
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/transport.CertificatesListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+      summary: Получить все сертификаты
+      tags:
+      - certificates
+    post:
+      consumes:
+      - application/json
+      description: Добавляет URL для мониторинга
+      parameters:
+      - description: URL
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/transport.AddURLRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+      summary: Добавить URL
+      tags:
+      - urls
+  /certificates/{id}/ttl:
+    get:
+      parameters:
+      - description: ID сертификата
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/transport.CertificateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+      summary: Получить сертификат по ID в БД
+      tags:
+      - certificate
+  /certificates/ttl:
+    get:
+      parameters:
+      - description: Цель URL
+        in: query
+        name: url
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/transport.CertificateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+      summary: Получить сертификат по ссылке без записи в БД
+      tags:
+      - certificate
+swagger: "2.0"
