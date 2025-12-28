@@ -12,7 +12,7 @@
 Сервис должен быть реализован на Go версии не ниже 1.19, базу данных использовать PostgreSQL, так же необходимо написать Dockerfile для сборки в контейнер.
 
 ## Swagger
-    http://localhost:8080/swagger/index.htm
+    http://localhost:8080/swagger/index.html
 
 ## Эндпоинты
     1. POST /certificates
