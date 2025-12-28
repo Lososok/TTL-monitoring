@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"app/internal/models"
 	"time"
 
 	"github.com/google/uuid"
@@ -33,4 +34,16 @@ type CertificatesListResponse struct {
 		Page  int `json:"page"`
 		Limit int `json:"limit"`
 	} `json:"meta"`
+}
+
+func toResponse(cert models.CertificateTLS) CertificateResponse {
+	ttl := time.Until(cert.NotAfter)
+
+	return CertificateResponse{
+		ID:           cert.ID,
+		URL:          cert.URL,
+		SerialNumber: cert.SerialNumber,
+		NotAfter:     cert.NotAfter,
+		TTLDays:      int64(ttl.Hours() / 24),
+	}
 }

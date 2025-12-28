@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"net/http"
+	"net/url"
+	"time"
 )
 
 func tls_handshake(url string) (models.CertificateTLS, error) {
@@ -14,11 +16,10 @@ func tls_handshake(url string) (models.CertificateTLS, error) {
 	}
 
 	config := &tls.Config{
-		// InsecureSkipVerify: *insecure,
 		RootCAs: rootCAs,
 	}
 	tr := &http.Transport{TLSClientConfig: config}
-	client := &http.Client{Transport: tr}
+	client := &http.Client{Transport: tr, Timeout: 10 * time.Second}
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -30,6 +31,11 @@ func tls_handshake(url string) (models.CertificateTLS, error) {
 		return models.CertificateTLS{}, err
 	}
 	defer resp.Body.Close()
+
+	if resp.TLS == nil || len(resp.TLS.PeerCertificates) == 0 {
+		return models.CertificateTLS{}, ErrTLS
+	}
+
 	return models.CertificateTLS{
 		URL:          url,
 		Version:      resp.TLS.PeerCertificates[0].Version,
@@ -39,4 +45,12 @@ func tls_handshake(url string) (models.CertificateTLS, error) {
 		Issuer:       resp.TLS.PeerCertificates[0].Issuer.CommonName,
 		SerialNumber: resp.TLS.PeerCertificates[0].SerialNumber.String(),
 	}, nil
+}
+
+func isValidURL(raw string) bool {
+	u, err := url.Parse(raw)
+	if err != nil {
+		return false
+	}
+	return u.Scheme == "https" && u.Host != ""
 }

@@ -1,6 +1,9 @@
 package app
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 
@@ -11,13 +14,15 @@ import (
 )
 
 func Run() error {
-	db, err := sql.Open("postgres", "postgres://tls_monitoring:tls_monitoring_password@db:5432/tls_monitoring?sslmode=disable")
+	dsn := buildPostgresdataSourceName()
+
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	dbCert := database.NewDDBCertificateTLB(db)
+	dbCert := database.NewDBCertificateTLB(db)
 	serviseCert := services.NewCertificateTLSService(dbCert)
 	handlerCert := transport.NewHandler(serviseCert)
 
@@ -26,4 +31,22 @@ func Run() error {
 	transport.RegisterSwagger(router)
 
 	return router.Run(":8080")
+}
+
+func buildPostgresdataSourceName() string {
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		getEnv("DB_USER", "postgres"),
+		getEnv("DB_PASSWORD", "postgres"),
+		getEnv("DB_HOST", "localhost"),
+		getEnv("DB_PORT", "5432"),
+		getEnv("DB_NAME", "postgres"),
+	)
+}
+
+func getEnv(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
 }

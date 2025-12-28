@@ -4,15 +4,17 @@ import (
 	"app/internal/models"
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgconn"
 )
 
 type DBCertificateTLS struct {
 	db *sql.DB
 }
 
-func NewDDBCertificateTLB(db *sql.DB) *DBCertificateTLS {
+func NewDBCertificateTLB(db *sql.DB) *DBCertificateTLS {
 	return &DBCertificateTLS{db: db}
 }
 
@@ -39,6 +41,12 @@ func (db *DBCertificateTLS) SaveCertificate(ctx context.Context, cert models.Cer
 		cert.SerialNumber,
 	).Scan(&id)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" {
+				return uuid.Nil, ErrAlreadyExists
+			}
+		}
 		return uuid.Nil, err
 	}
 	return id, nil
@@ -99,6 +107,9 @@ func (db *DBCertificateTLS) GetCertificateByID(ctx context.Context, id uuid.UUID
 		&cert.SerialNumber,
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.CertificateTLS{}, ErrNotFound
+		}
 		return models.CertificateTLS{}, err
 	}
 
