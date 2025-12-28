@@ -14,13 +14,6 @@
 
 ## Запуск
     Из ./deployments
-
-
-    создание go.mod и go.sum (для Windows с PowerShell)
-    ```
-    docker run --rm -v "${PWD}:/app" -w /app golang:1.25-alpine sh -c "go mod init app && go mod tidy"
-    ```
-
     ```
     docker compose --env-file ../configs/.env up --build -d
     ```
@@ -43,3 +36,16 @@
 
 ## Swagger
     http://localhost:8080/swagger/index.htm
+
+## Эндпоинты
+    1. POST /certificates
+    Добавление ресурса для отслеживания по url
+
+    2. GET /certificates
+    Получение всех записей (с пагинацией)
+    
+    3. GET /certificates/:id/ttl
+    Получение сертификата по id
+
+    4. GET /certificates/ttl
+    Проверка сертификата по url
