@@ -10,10 +10,10 @@ import (
 )
 
 type Handler struct {
-	service *services.CertificateTLSService
+	service services.SertificateInterface
 }
 
-func NewHandler(s *services.CertificateTLSService) *Handler {
+func NewHandler(s services.SertificateInterface) *Handler {
 	return &Handler{service: s}
 }
 
@@ -31,7 +31,7 @@ func (h *Handler) Register(router *gin.Engine) {
 // @Accept json
 // @Produce json
 // @Param request body AddURLRequest true "URL"
-// @Success 201
+// @Success 201 {object} CreateCertificateResponse
 // @Failure 400 {object} ErrorResponse
 // @Router /certificates [post]
 func (h *Handler) CreateCertificateTLS(c *gin.Context) {
@@ -40,13 +40,14 @@ func (h *Handler) CreateCertificateTLS(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	if err := h.service.AddURL(c.Request.Context(), req.URL); err != nil {
+	id, err := h.service.AddURL(c.Request.Context(), req.URL)
+	if err != nil {
 		mapServiceError(c, err)
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	response := CreateCertificateResponse{ID: id}
+	c.JSON(http.StatusCreated, response)
 }
 
 // GetAllCertificatesTLS godoc
@@ -78,18 +79,8 @@ func (h *Handler) GetAllCertificatesTLS(c *gin.Context) {
 		return
 	}
 
-	responses := make([]CertificateResponse, 0, len(certs))
-	for _, cert := range certs {
-		responses = append(responses, toResponse(cert))
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"data": responses,
-		"meta": gin.H{
-			"page":  req.Page,
-			"limit": req.Limit,
-		},
-	})
+	response := NewCertificatesListResponse(certs, req.Page, req.Limit)
+	c.JSON(http.StatusOK, response)
 }
 
 // GetCertificateTLSByID godoc

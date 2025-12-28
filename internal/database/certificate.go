@@ -7,7 +7,8 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgconn"
+	"github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 type DBCertificateTLS struct {
@@ -41,7 +42,7 @@ func (db *DBCertificateTLS) SaveCertificate(ctx context.Context, cert models.Cer
 		cert.SerialNumber,
 	).Scan(&id)
 	if err != nil {
-		var pgErr *pgconn.PgError
+		var pgErr *pq.Error
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == "23505" {
 				return uuid.Nil, ErrAlreadyExists

@@ -22,9 +22,13 @@ func Run() error {
 	}
 	defer db.Close()
 
-	dbCert := database.NewDBCertificateTLS(db)
-	serviseCert := services.NewCertificateTLSService(dbCert)
-	handlerCert := transport.NewHandler(serviseCert)
+	// dbCert := database.NewDBCertificateTLS(db)
+	// serviceCert := services.NewCertificateTLSService(dbCert)
+	// handlerCert := transport.NewHandler(serviceCert)
+
+	dbCert := database.NewDataBase(db)
+	serviceCert := services.NewService(dbCert)
+	handlerCert := transport.NewHandler(serviceCert)
 
 	router := gin.Default()
 	handlerCert.Register(router)

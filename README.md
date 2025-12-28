@@ -11,29 +11,6 @@
 
 Сервис должен быть реализован на Go версии не ниже 1.19, базу данных использовать PostgreSQL, так же необходимо написать Dockerfile для сборки в контейнер.
 
-
-## Запуск
-    Из ./deployments
-    ```
-    docker compose --env-file ../configs/.env up --build -d
-    ```
-
-## Миграции
-    инициализация миграций:
-    ```
-    migrate create -ext sql -dir migrations/ -seq init_mg
-    ```
-
-    применение:
-    ```
-    migrate -path migrations// -database "postgresql://tls_monitoring:tls_monitoring_password@localhost:5433/tls_monitoring?sslmode=disable" -verbose up
-    ```
-    
-    шаблон:
-    ```
-    migrate -path migration/ -database "postgresql://username:secretkey@localhost:5432/database_name?sslmode=disable" -verbose up
-    ```
-
 ## Swagger
     http://localhost:8080/swagger/index.htm
 
@@ -49,3 +26,17 @@
 
     4. GET /certificates/ttl
     Проверка сертификата по url
+
+## Makefile
+    1. make
+    Запуск контейнеров с сервисом и БД
+
+    2. make migration_up
+    Применение миграций
+
+    3. make migration_down
+    Откат миграций
+
+    4. make gen_doc
+    Формирование документации сваггера
+    

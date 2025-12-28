@@ -32,6 +32,11 @@ definitions:
             type: integer
         type: object
     type: object
+  transport.CreateCertificateResponse:
+    properties:
+      id:
+        type: string
+    type: object
   transport.ErrorResponse:
     properties:
       error:
@@ -84,6 +89,8 @@ paths:
       responses:
         "201":
           description: Created
+          schema:
+            $ref: '#/definitions/transport.CreateCertificateResponse'
         "400":
           description: Bad Request
           schema:

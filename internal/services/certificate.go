@@ -10,30 +10,30 @@ import (
 )
 
 type CertificateTLSService struct {
-	db *database.DBCertificateTLS
+	db *database.DataBase
 }
 
-func NewCertificateTLSService(db *database.DBCertificateTLS) *CertificateTLSService {
+func NewCertificateTLSService(db *database.DataBase) *CertificateTLSService {
 	return &CertificateTLSService{db: db}
 }
 
-func (c *CertificateTLSService) AddURL(ctx context.Context, url string) error {
+func (c *CertificateTLSService) AddURL(ctx context.Context, url string) (uuid.UUID, error) {
 	if !isValidURL(url) {
-		return ErrInvalidURL
+		return uuid.Nil, ErrInvalidURL
 	}
 
 	cert, err := tlsHandshake(url)
 	if err != nil {
-		return ErrTLS
+		return uuid.Nil, ErrTLS
 	}
-	_, err = c.db.SaveCertificate(ctx, cert)
+	id, err := c.db.SaveCertificate(ctx, cert)
 	if err != nil {
 		if errors.Is(err, database.ErrAlreadyExists) {
-			return ErrAlreadyExists
+			return id, ErrAlreadyExists
 		}
-		return err
+		return uuid.Nil, err
 	}
-	return nil
+	return id, nil
 }
 
 func (c *CertificateTLSService) GetAll(ctx context.Context, page, limit int) ([]models.CertificateTLS, error) {

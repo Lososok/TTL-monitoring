@@ -11,6 +11,10 @@ type AddURLRequest struct {
 	URL string `json:"url" example:"example.com"`
 }
 
+type CreateCertificateResponse struct {
+	ID uuid.UUID `json:"id"`
+}
+
 type PaginationQuery struct {
 	Page  int `form:"page" binding:"omitempty,min=1"`
 	Limit int `form:"limit" binding:"omitempty,min=1,max=100"`
@@ -34,6 +38,25 @@ type CertificatesListResponse struct {
 		Page  int `json:"page"`
 		Limit int `json:"limit"`
 	} `json:"meta"`
+}
+
+func NewCertificatesListResponse(certs []models.CertificateTLS, page, limit int) CertificatesListResponse {
+	response := CertificatesListResponse{
+		Data: make([]CertificateResponse, 0, len(certs)),
+		Meta: struct {
+			Page  int `json:"page"`
+			Limit int `json:"limit"`
+		}{
+			Page:  page,
+			Limit: limit,
+		},
+	}
+
+	for _, cert := range certs {
+		response.Data = append(response.Data, toResponse(cert))
+	}
+
+	return response
 }
 
 func toResponse(cert models.CertificateTLS) CertificateResponse {

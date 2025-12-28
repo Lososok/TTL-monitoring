@@ -81,7 +81,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/transport.CreateCertificateResponse"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -222,6 +225,14 @@ const docTemplate = `{
                             "type": "integer"
                         }
                     }
+                }
+            }
+        },
+        "transport.CreateCertificateResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
                 }
             }
         },
