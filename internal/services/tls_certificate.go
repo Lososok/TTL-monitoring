@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func tls_handshake(url string) (models.CertificateTLS, error) {
+func tlsHandshake(url string) (models.CertificateTLS, error) {
 	rootCAs, _ := x509.SystemCertPool()
 	if rootCAs == nil {
 		rootCAs = x509.NewCertPool()
@@ -21,7 +21,7 @@ func tls_handshake(url string) (models.CertificateTLS, error) {
 	tr := &http.Transport{TLSClientConfig: config}
 	client := &http.Client{Transport: tr, Timeout: 10 * time.Second}
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodHead, url, nil)
 	if err != nil {
 		return models.CertificateTLS{}, err
 	}

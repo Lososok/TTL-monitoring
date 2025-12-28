@@ -22,7 +22,7 @@ func Run() error {
 	}
 	defer db.Close()
 
-	dbCert := database.NewDBCertificateTLB(db)
+	dbCert := database.NewDBCertificateTLS(db)
 	serviseCert := services.NewCertificateTLSService(dbCert)
 	handlerCert := transport.NewHandler(serviseCert)
 

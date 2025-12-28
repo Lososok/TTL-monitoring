@@ -14,7 +14,7 @@ type DBCertificateTLS struct {
 	db *sql.DB
 }
 
-func NewDBCertificateTLB(db *sql.DB) *DBCertificateTLS {
+func NewDBCertificateTLS(db *sql.DB) *DBCertificateTLS {
 	return &DBCertificateTLS{db: db}
 }
 

@@ -22,7 +22,7 @@ func (c *CertificateTLSService) AddURL(ctx context.Context, url string) error {
 		return ErrInvalidURL
 	}
 
-	cert, err := tls_handshake(url)
+	cert, err := tlsHandshake(url)
 	if err != nil {
 		return ErrTLS
 	}
@@ -61,7 +61,7 @@ func (c *CertificateTLSService) GetByURL(url string) (models.CertificateTLS, err
 		return models.CertificateTLS{}, ErrInvalidURL
 	}
 
-	cert, err := tls_handshake(url)
+	cert, err := tlsHandshake(url)
 	if err != nil {
 		return models.CertificateTLS{}, ErrTLS
 	}
